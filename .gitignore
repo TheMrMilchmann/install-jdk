@@ -1,0 +1,6 @@
+!/.idea
+/.idea/*
+!/.idea/copyright
+!/.idea/scopes/
+/node_modules
+/out
