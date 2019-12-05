@@ -1,0 +1,23 @@
+name: 'Install JDK'
+description: 'Set up a specific version of the Java JDK for use during an workflow.'
+author: 'Leon Linhart'
+inputs:
+  jdk-version:
+    description: 'The JDK version to setup.'
+  architecture:
+    description: 'The architecture (x86, x64) of the JDK. (This not relevant when an explicit source is specified.)'
+    required: false
+    default: 'x64'
+  source:
+    description: ''
+    required: false
+  targets:
+    description: 'A semicolon-separated list of environment variables that should point to the JDK. (Defaults to "JAVA_HOME".)'
+    required: false
+    default: 'JAVA_HOME'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  color: white
+  icon: download
