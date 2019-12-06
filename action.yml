@@ -2,7 +2,7 @@ name: 'Install JDK'
 description: 'Set up a specific version of the Java JDK for use during an workflow.'
 author: 'Leon Linhart'
 inputs:
-  jdk-version:
+  version:
     description: 'The JDK version to setup.'
   architecture:
     description: 'The architecture (x86, x64) of the JDK. (This not relevant when an explicit source is specified.)'
