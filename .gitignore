@@ -2,5 +2,6 @@
 /.idea/*
 !/.idea/copyright/
 !/.idea/scopes/
+/lib
 /node_modules
 /out
