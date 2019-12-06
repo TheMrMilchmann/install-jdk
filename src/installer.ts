@@ -30,7 +30,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const IS_WINDOWS = process.platform === 'win32';
-let OS;
+let OS: string;
 
 if (!tempDirectory) {
     let baseLocation;
@@ -83,7 +83,7 @@ export async function installJDK(
         }
 
         let tempDir: string = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000));
-        jdkDir = decompressArchive(jdkFile, tempDir);
+        jdkDir = await decompressArchive(jdkFile, tempDir);
         toolPath = await tc.cacheDir(
             jdkDir,
             cacheEntry,
