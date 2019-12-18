@@ -51,6 +51,7 @@ export async function installJDK(
     version: string,
     arch: string,
     source: string,
+    archiveExtension: string,
     targets: string
 ): Promise<void> {
     const cacheEntry = `${source ? source : "jdk"}-${version}`; // Trick the caching system for more flexibility
@@ -73,16 +74,18 @@ export async function installJDK(
              * - an archive file
              */
             if (source.startsWith("http://") || source.startsWith("https://")) {
+                if (!archiveExtension) core.error("archiveExtension must be set explicitly when source is an URL");
+
                 core.debug(`Downloading JDK from explicit source: ${source}`);
                 jdkFile = await tc.downloadTool(source);
-                compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar'; // TODO this is a risky assumption. (Probably needs to be set manually.)
+                compressedFileExtension = archiveExtension;
             } else {
-                jdkFile = source
+                jdkFile = source;
             }
         } else {
             core.debug('Downloading JDK from AdoptOpenJDK');
             jdkFile = await tc.downloadTool(`https://api.adoptopenjdk.net/v2/binary/releases/openjdk${normalize(version)}?openjdk_impl=hotspot&os=${OS}&arch=${arch}&release=latest&type=jdk`);
-            compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar';
+            compressedFileExtension = archiveExtension || IS_WINDOWS ? '.zip' : '.tar';
         }
 
         compressedFileExtension = compressedFileExtension || getNormalizedCompressedFileExtension(jdkFile);

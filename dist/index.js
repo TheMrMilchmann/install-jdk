@@ -3171,12 +3171,19 @@ function run() {
             let version = core.getInput('version', { required: true });
             let arch = core.getInput('architecture', { required: false });
             let source = core.getInput('source', { required: false });
+            let archiveExtension = core.getInput("archiveExtension", { required: false });
+            if (archiveExtension
+                && archiveExtension != ".zip"
+                && archiveExtension != ".tar"
+                && archiveExtension != ".7z") {
+                core.error(`archiveExtension should be one of [.zip, .tar, .7z]. Found: ${archiveExtension}`);
+            }
             let targets = core.getInput('targets', { required: false });
             if (!arch)
                 arch = 'x64';
             if (!targets)
                 targets = 'JAVA_HOME';
-            yield installer.installJDK(version, arch, source, targets);
+            yield installer.installJDK(version, arch, source, archiveExtension, targets);
             //        const matchersPath = path.join(__dirname, '..', '.github');
             //        console.log(`##[add-matcher]${path.join(matchersPath, 'java.json')}`);
         }
@@ -3977,7 +3984,7 @@ if (!tempDirectory) {
     }
     tempDirectory = path.join(baseLocation, 'actions', 'temp');
 }
-function installJDK(version, arch, source, targets) {
+function installJDK(version, arch, source, archiveExtension, targets) {
     return __awaiter(this, void 0, void 0, function* () {
         const cacheEntry = `${source ? source : "jdk"}-${version}`; // Trick the caching system for more flexibility
         let toolPath = tc.find(cacheEntry, "1.0.0", arch);
@@ -3997,9 +4004,11 @@ function installJDK(version, arch, source, targets) {
                  * - an archive file
                  */
                 if (source.startsWith("http://") || source.startsWith("https://")) {
+                    if (!archiveExtension)
+                        core.error("archiveExtension must be set explicitly when source is an URL");
                     core.debug(`Downloading JDK from explicit source: ${source}`);
                     jdkFile = yield tc.downloadTool(source);
-                    compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar'; // TODO this is a risky assumption. (Probably needs to be set manually.)
+                    compressedFileExtension = archiveExtension;
                 }
                 else {
                     jdkFile = source;
@@ -4008,7 +4017,7 @@ function installJDK(version, arch, source, targets) {
             else {
                 core.debug('Downloading JDK from AdoptOpenJDK');
                 jdkFile = yield tc.downloadTool(`https://api.adoptopenjdk.net/v2/binary/releases/openjdk${normalize(version)}?openjdk_impl=hotspot&os=${OS}&arch=${arch}&release=latest&type=jdk`);
-                compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar';
+                compressedFileExtension = archiveExtension || IS_WINDOWS ? '.zip' : '.tar';
             }
             compressedFileExtension = compressedFileExtension || getNormalizedCompressedFileExtension(jdkFile);
             let tempDir = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000));

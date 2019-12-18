@@ -45,12 +45,13 @@ installing JDKs to one (or more) given `target` environment variables.
 
 ### Configuration:
 
-| Parameter      | Default     |
-|----------------|-------------|
-| `version`      |             |
-| `architecture` | `x64`       |
-| `source`       |             |
-| `targets`      | `JAVA_HOME` |
+| Parameter          | Default     |
+|--------------------|-------------|
+| `version`          |             |
+| `architecture`     | `x64`       |
+| `source`           |             |
+| `archiveExtension` |             |
+| `targets`          | `JAVA_HOME` |
 
 #### `version`
 
@@ -69,8 +70,14 @@ Defaults to `x64`.
 
 #### `source`
 
-An explicit source location of a JDK. This might be either a local directory,
+A custom source location of a JDK. This might be either a local directory,
 a compressed file, or an url.
+
+#### `archiveExtension`
+
+The extension of the JDK archive. (Supported values are: `.zip`, `.tar`, `.7z`)
+
+Specifying this property is required when a custom `source` is set.
 
 #### `targets`
 
