@@ -3963,20 +3963,26 @@ const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const IS_WINDOWS = process.platform === 'win32';
 let OS;
+if (IS_WINDOWS) {
+    OS = "windows";
+}
+else if (process.platform === 'darwin') {
+    OS = "mac";
+}
+else {
+    OS = "linux";
+}
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
         // On windows use the USERPROFILE env variable
         baseLocation = process.env['USERPROFILE'] || 'C:\\';
-        OS = "windows";
     }
     else if (process.platform === 'darwin') {
         baseLocation = '/Users';
-        OS = "mac";
     }
     else {
         baseLocation = '/home';
-        OS = "linux";
     }
     tempDirectory = path.join(baseLocation, 'actions', 'temp');
 }
@@ -3991,6 +3997,7 @@ function installJDK(version, arch, source, targets) {
             let jdkFile;
             let jdkDir;
             if (source) {
+                core.debug(`Attempting to use JDK from source: ${source}`);
                 /*
                  * Source could refer to
                  * - an URL (discovered by http or https protocol prefix),

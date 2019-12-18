@@ -32,19 +32,24 @@ import * as path from 'path';
 const IS_WINDOWS = process.platform === 'win32';
 let OS: string;
 
+if (IS_WINDOWS) {
+    OS = "windows";
+} else if (process.platform === 'darwin') {
+    OS = "mac";
+} else {
+    OS = "linux";
+}
+
 if (!tempDirectory) {
     let baseLocation;
 
     if (IS_WINDOWS) {
         // On windows use the USERPROFILE env variable
         baseLocation = process.env['USERPROFILE'] || 'C:\\';
-        OS = "windows";
     } else if (process.platform === 'darwin') {
         baseLocation = '/Users';
-        OS = "mac";
     } else {
         baseLocation = '/home';
-        OS = "linux";
     }
 
     tempDirectory = path.join(baseLocation, 'actions', 'temp');
@@ -66,6 +71,8 @@ export async function installJDK(
         let jdkDir;
 
         if (source) {
+            core.debug(`Attempting to use JDK from source: ${source}`);
+
             /*
              * Source could refer to
              * - an URL (discovered by http or https protocol prefix),
