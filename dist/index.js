@@ -3987,6 +3987,7 @@ function installJDK(version, arch, source, targets) {
         else {
             let jdkFile;
             let jdkDir;
+            let compressedFileExtension;
             if (source) {
                 core.debug(`Attempting to use JDK from source: ${source}`);
                 /*
@@ -3998,6 +3999,7 @@ function installJDK(version, arch, source, targets) {
                 if (source.startsWith("http://") || source.startsWith("https://")) {
                     core.debug(`Downloading JDK from explicit source: ${source}`);
                     jdkFile = yield tc.downloadTool(source);
+                    compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar'; // TODO this is a risky assumption. (Probably needs to be set manually.)
                 }
                 else {
                     jdkFile = source;
@@ -4006,9 +4008,11 @@ function installJDK(version, arch, source, targets) {
             else {
                 core.debug('Downloading JDK from AdoptOpenJDK');
                 jdkFile = yield tc.downloadTool(`https://api.adoptopenjdk.net/v2/binary/releases/openjdk${normalize(version)}?openjdk_impl=hotspot&os=${OS}&arch=${arch}&release=latest&type=jdk`);
+                compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar';
             }
+            compressedFileExtension = compressedFileExtension || getNormalizedCompressedFileExtension(jdkFile);
             let tempDir = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000));
-            jdkDir = yield decompressArchive(jdkFile, tempDir);
+            jdkDir = yield decompressArchive(jdkFile, compressedFileExtension, tempDir);
             toolPath = yield tc.cacheDir(jdkDir, cacheEntry, "1.0.0", arch);
         }
         targets.split(";").forEach(function (value) {
@@ -4019,13 +4023,24 @@ function installJDK(version, arch, source, targets) {
     });
 }
 exports.installJDK = installJDK;
-function decompressArchive(repoRoot, destinationFolder) {
+function getNormalizedCompressedFileExtension(file) {
+    if (file.endsWith('.tar') || file.endsWith('.tar.gz')) {
+        return '.tar';
+    }
+    else if (file.endsWith('.zip')) {
+        return '.zip';
+    }
+    else {
+        return '.7z';
+    }
+}
+function decompressArchive(repoRoot, fileEnding, destinationFolder) {
     return __awaiter(this, void 0, void 0, function* () {
         yield io.mkdirP(destinationFolder);
         const jdkFile = path.normalize(repoRoot);
         const stats = fs.statSync(jdkFile);
         if (stats.isFile()) {
-            yield extractFiles(jdkFile, destinationFolder);
+            yield extractFiles(jdkFile, fileEnding, destinationFolder);
             const jdkDirectory = path.join(destinationFolder, fs.readdirSync(destinationFolder)[0]);
             yield unpackJars(jdkDirectory, path.join(jdkDirectory, 'bin'));
             return jdkDirectory;
@@ -4038,7 +4053,7 @@ function decompressArchive(repoRoot, destinationFolder) {
         }
     });
 }
-function extractFiles(file, destinationFolder) {
+function extractFiles(file, fileEnding, destinationFolder) {
     return __awaiter(this, void 0, void 0, function* () {
         const stats = fs.statSync(file);
         if (!stats) {
@@ -4047,11 +4062,11 @@ function extractFiles(file, destinationFolder) {
         else if (stats.isDirectory()) {
             throw new Error(`Failed to extract ${file} - it is a directory`);
         }
-        if (file.endsWith('.tar') || file.endsWith('.tar.gz')) {
+        if (fileEnding == '.tar') {
             core.debug(`Decompressing .tar archive: ${file}`);
             yield tc.extractTar(file, destinationFolder);
         }
-        else if (file.endsWith('.zip')) {
+        else if (fileEnding == '.zip') {
             core.debug(`Decompressing .zip archive: ${file}`);
             yield tc.extractZip(file, destinationFolder);
         }

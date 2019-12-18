@@ -61,6 +61,7 @@ export async function installJDK(
     } else {
         let jdkFile;
         let jdkDir;
+        let compressedFileExtension;
 
         if (source) {
             core.debug(`Attempting to use JDK from source: ${source}`);
@@ -73,17 +74,21 @@ export async function installJDK(
              */
             if (source.startsWith("http://") || source.startsWith("https://")) {
                 core.debug(`Downloading JDK from explicit source: ${source}`);
-                jdkFile = await tc.downloadTool(source)
+                jdkFile = await tc.downloadTool(source);
+                compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar'; // TODO this is a risky assumption. (Probably needs to be set manually.)
             } else {
                 jdkFile = source
             }
         } else {
             core.debug('Downloading JDK from AdoptOpenJDK');
             jdkFile = await tc.downloadTool(`https://api.adoptopenjdk.net/v2/binary/releases/openjdk${normalize(version)}?openjdk_impl=hotspot&os=${OS}&arch=${arch}&release=latest&type=jdk`);
+            compressedFileExtension = IS_WINDOWS ? '.zip' : '.tar';
         }
 
+        compressedFileExtension = compressedFileExtension || getNormalizedCompressedFileExtension(jdkFile);
+
         let tempDir: string = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000));
-        jdkDir = await decompressArchive(jdkFile, tempDir);
+        jdkDir = await decompressArchive(jdkFile, compressedFileExtension, tempDir);
         toolPath = await tc.cacheDir(
             jdkDir,
             cacheEntry,
@@ -98,8 +103,19 @@ export async function installJDK(
     });
 }
 
+function getNormalizedCompressedFileExtension(file: string): string {
+    if (file.endsWith('.tar') || file.endsWith('.tar.gz')) {
+        return '.tar';
+    } else if (file.endsWith('.zip')) {
+        return '.zip';
+    } else {
+        return '.7z';
+    }
+}
+
 async function decompressArchive(
     repoRoot: string,
+    fileEnding: string,
     destinationFolder: string
 ): Promise<string> {
     await io.mkdirP(destinationFolder);
@@ -108,7 +124,7 @@ async function decompressArchive(
     const stats = fs.statSync(jdkFile);
 
     if (stats.isFile()) {
-        await extractFiles(jdkFile, destinationFolder);
+        await extractFiles(jdkFile, fileEnding, destinationFolder);
 
         const jdkDirectory = path.join(destinationFolder, fs.readdirSync(destinationFolder)[0]);
         await unpackJars(jdkDirectory, path.join(jdkDirectory, 'bin'));
@@ -123,6 +139,7 @@ async function decompressArchive(
 
 async function extractFiles(
     file: string,
+    fileEnding: string,
     destinationFolder: string
 ): Promise<void> {
     const stats = fs.statSync(file);
@@ -132,10 +149,10 @@ async function extractFiles(
         throw new Error(`Failed to extract ${file} - it is a directory`);
     }
 
-    if (file.endsWith('.tar') || file.endsWith('.tar.gz')) {
+    if (fileEnding == '.tar') {
         core.debug(`Decompressing .tar archive: ${file}`);
         await tc.extractTar(file, destinationFolder);
-    } else if (file.endsWith('.zip')) {
+    } else if (fileEnding == '.zip') {
         core.debug(`Decompressing .zip archive: ${file}`);
         await tc.extractZip(file, destinationFolder);
     } else {
