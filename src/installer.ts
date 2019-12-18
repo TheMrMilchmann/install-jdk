@@ -92,7 +92,7 @@ export async function installJDK(
         );
     }
 
-    targets.split(",").forEach(function (value) {
+    targets.split(";").forEach(function (value) {
         if (value == 'JAVA_HOME') core.addPath(path.join(toolPath, 'bin'));
         core.exportVariable(value, toolPath);
     });

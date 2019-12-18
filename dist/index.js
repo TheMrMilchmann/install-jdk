@@ -3169,9 +3169,13 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let version = core.getInput('version', { required: true });
-            let arch = core.getInput('architecture', { required: true });
-            let source = core.getInput('source', { required: true });
-            let targets = core.getInput('source', { required: true });
+            let arch = core.getInput('architecture', { required: false });
+            let source = core.getInput('source', { required: false });
+            let targets = core.getInput('source', { required: false });
+            if (!arch)
+                arch = 'x64';
+            if (!targets)
+                targets = 'JAVA_HOME';
             yield installer.installJDK(version, arch, source, targets);
             //        const matchersPath = path.join(__dirname, '..', '.github');
             //        console.log(`##[add-matcher]${path.join(matchersPath, 'java.json')}`);
@@ -4008,7 +4012,7 @@ function installJDK(version, arch, source, targets) {
             jdkDir = yield decompressArchive(jdkFile, tempDir);
             toolPath = yield tc.cacheDir(jdkDir, cacheEntry, "1.0.0", arch);
         }
-        targets.split(",").forEach(function (value) {
+        targets.split(";").forEach(function (value) {
             if (value == 'JAVA_HOME')
                 core.addPath(path.join(toolPath, 'bin'));
             core.exportVariable(value, toolPath);

@@ -26,9 +26,12 @@ import * as installer from './installer';
 async function run() {
     try {
         let version = core.getInput('version', { required: true });
-        let arch = core.getInput('architecture', {required: true });
-        let source = core.getInput('source', {required: true });
-        let targets = core.getInput('source', {required: true });
+        let arch = core.getInput('architecture', { required: false });
+        let source = core.getInput('source', { required: false });
+        let targets = core.getInput('source', { required: false });
+
+        if (!arch) arch = 'x64';
+        if (!targets) targets = 'JAVA_HOME';
 
         await installer.installJDK(version, arch, source, targets);
 
