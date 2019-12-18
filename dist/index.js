@@ -3962,16 +3962,7 @@ const tc = __importStar(__webpack_require__(533));
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const IS_WINDOWS = process.platform === 'win32';
-let OS;
-if (IS_WINDOWS) {
-    OS = "windows";
-}
-else if (process.platform === 'darwin') {
-    OS = "mac";
-}
-else {
-    OS = "linux";
-}
+let OS = IS_WINDOWS ? "windows" : process.platform === 'darwin' ? "mac" : "linux";
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
@@ -4005,6 +3996,7 @@ function installJDK(version, arch, source, targets) {
                  * - an archive file
                  */
                 if (source.startsWith("http://") || source.startsWith("https://")) {
+                    core.debug(`Downloading JDK from explicit source: ${source}`);
                     jdkFile = yield tc.downloadTool(source);
                 }
                 else {
@@ -4012,7 +4004,7 @@ function installJDK(version, arch, source, targets) {
                 }
             }
             else {
-                core.debug('Attempting to download JDK from AdoptOpenJDK');
+                core.debug('Downloading JDK from AdoptOpenJDK');
                 jdkFile = yield tc.downloadTool(`https://api.adoptopenjdk.net/v2/binary/releases/openjdk${normalize(version)}?openjdk_impl=hotspot&os=${OS}&arch=${arch}&release=latest&type=jdk`);
             }
             let tempDir = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000));
@@ -4056,12 +4048,15 @@ function extractFiles(file, destinationFolder) {
             throw new Error(`Failed to extract ${file} - it is a directory`);
         }
         if (file.endsWith('.tar') || file.endsWith('.tar.gz')) {
+            core.debug(`Decompressing .tar archive: ${file}`);
             yield tc.extractTar(file, destinationFolder);
         }
         else if (file.endsWith('.zip')) {
+            core.debug(`Decompressing .zip archive: ${file}`);
             yield tc.extractZip(file, destinationFolder);
         }
         else {
+            core.debug(`Attempting to decompress unknown archive using 7z: ${file}`);
             yield tc.extract7z(file, destinationFolder);
         }
     });

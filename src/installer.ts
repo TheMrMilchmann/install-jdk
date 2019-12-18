@@ -30,15 +30,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const IS_WINDOWS = process.platform === 'win32';
-let OS: string;
-
-if (IS_WINDOWS) {
-    OS = "windows";
-} else if (process.platform === 'darwin') {
-    OS = "mac";
-} else {
-    OS = "linux";
-}
+let OS = IS_WINDOWS ? "windows" : process.platform === 'darwin' ? "mac" : "linux";
 
 if (!tempDirectory) {
     let baseLocation;
@@ -80,12 +72,13 @@ export async function installJDK(
              * - an archive file
              */
             if (source.startsWith("http://") || source.startsWith("https://")) {
+                core.debug(`Downloading JDK from explicit source: ${source}`);
                 jdkFile = await tc.downloadTool(source)
             } else {
                 jdkFile = source
             }
         } else {
-            core.debug('Attempting to download JDK from AdoptOpenJDK');
+            core.debug('Downloading JDK from AdoptOpenJDK');
             jdkFile = await tc.downloadTool(`https://api.adoptopenjdk.net/v2/binary/releases/openjdk${normalize(version)}?openjdk_impl=hotspot&os=${OS}&arch=${arch}&release=latest&type=jdk`);
         }
 
@@ -140,10 +133,13 @@ async function extractFiles(
     }
 
     if (file.endsWith('.tar') || file.endsWith('.tar.gz')) {
+        core.debug(`Decompressing .tar archive: ${file}`);
         await tc.extractTar(file, destinationFolder);
     } else if (file.endsWith('.zip')) {
+        core.debug(`Decompressing .zip archive: ${file}`);
         await tc.extractZip(file, destinationFolder);
     } else {
+        core.debug(`Attempting to decompress unknown archive using 7z: ${file}`);
         await tc.extract7z(file, destinationFolder);
     }
 }
