@@ -81,7 +81,7 @@ By default, this is set to `JAVA_HOME`. Keep in mind that this is overwritten
 when specifying targets explicitly. Thus, if you want to make a JDK available
 from - say - `JDK_X` and `JAVA_HOME`, you would need to specify:
 
-    targets: 'JDK_X;JAVA_HOME'"
+    targets: 'JDK_X;JAVA_HOME'
 
 
 ## License
