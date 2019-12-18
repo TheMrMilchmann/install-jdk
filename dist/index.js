@@ -3171,7 +3171,7 @@ function run() {
             let version = core.getInput('version', { required: true });
             let arch = core.getInput('architecture', { required: false });
             let source = core.getInput('source', { required: false });
-            let targets = core.getInput('source', { required: false });
+            let targets = core.getInput('targets', { required: false });
             if (!arch)
                 arch = 'x64';
             if (!targets)
