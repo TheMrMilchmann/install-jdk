@@ -20,15 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import * as core from '@actions/core';
-import * as installer from './installer';
+import * as core from "@actions/core";
+import * as installer from "./installer";
 
 async function run() {
     try {
 
-        let version = core.getInput('version', { required: true });
-        let arch = core.getInput('architecture', { required: false });
-        let source = core.getInput('source', { required: false });
+        let version = core.getInput("version", { required: true });
+        let arch = core.getInput("architecture", { required: false });
+        let source = core.getInput("source", { required: false });
 
         let archiveExtension = core.getInput("archiveExtension", { required: false });
         if (archiveExtension
@@ -38,10 +38,10 @@ async function run() {
             core.error(`archiveExtension should be one of [.zip, .tar, .7z]. Found: ${archiveExtension}`);
         }
 
-        let targets = core.getInput('targets', { required: false });
+        let targets = core.getInput("targets", { required: false });
 
-        if (!arch) arch = 'x64';
-        if (!targets) targets = 'JAVA_HOME';
+        if (!arch) arch = "x64";
+        if (!targets) targets = "JAVA_HOME";
 
         await installer.installJDK(version, arch, source, archiveExtension, targets);
 

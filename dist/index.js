@@ -3168,9 +3168,9 @@ const installer = __importStar(__webpack_require__(749));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let version = core.getInput('version', { required: true });
-            let arch = core.getInput('architecture', { required: false });
-            let source = core.getInput('source', { required: false });
+            let version = core.getInput("version", { required: true });
+            let arch = core.getInput("architecture", { required: false });
+            let source = core.getInput("source", { required: false });
             let archiveExtension = core.getInput("archiveExtension", { required: false });
             if (archiveExtension
                 && archiveExtension != ".zip"
@@ -3178,11 +3178,11 @@ function run() {
                 && archiveExtension != ".7z") {
                 core.error(`archiveExtension should be one of [.zip, .tar, .7z]. Found: ${archiveExtension}`);
             }
-            let targets = core.getInput('targets', { required: false });
+            let targets = core.getInput("targets", { required: false });
             if (!arch)
-                arch = 'x64';
+                arch = "x64";
             if (!targets)
-                targets = 'JAVA_HOME';
+                targets = "JAVA_HOME";
             yield installer.installJDK(version, arch, source, archiveExtension, targets);
             //        const matchersPath = path.join(__dirname, '..', '.github');
             //        console.log(`##[add-matcher]${path.join(matchersPath, 'java.json')}`);
@@ -3961,28 +3961,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-let tempDirectory = process.env['RUNNER_TEMP'] || '';
+let tempDirectory = process.env["RUNNER_TEMP"] || "";
 const core = __importStar(__webpack_require__(470));
 const io = __importStar(__webpack_require__(1));
 const exec = __importStar(__webpack_require__(986));
 const tc = __importStar(__webpack_require__(533));
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
-const IS_WINDOWS = process.platform === 'win32';
-let OS = IS_WINDOWS ? "windows" : process.platform === 'darwin' ? "mac" : "linux";
+const IS_WINDOWS = process.platform === "win32";
+let OS = IS_WINDOWS ? "windows" : process.platform === "darwin" ? "mac" : "linux";
 if (!tempDirectory) {
     let baseLocation;
     if (IS_WINDOWS) {
         // On windows use the USERPROFILE env variable
-        baseLocation = process.env['USERPROFILE'] || 'C:\\';
+        baseLocation = process.env["USERPROFILE"] || "C:\\";
     }
-    else if (process.platform === 'darwin') {
-        baseLocation = '/Users';
+    else if (process.platform === "darwin") {
+        baseLocation = "/Users";
     }
     else {
-        baseLocation = '/home';
+        baseLocation = "/home";
     }
-    tempDirectory = path.join(baseLocation, 'actions', 'temp');
+    tempDirectory = path.join(baseLocation, "actions", "temp");
 }
 function installJDK(version, arch, source, archiveExtension, targets) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -4015,32 +4015,32 @@ function installJDK(version, arch, source, archiveExtension, targets) {
                 }
             }
             else {
-                core.debug('Downloading JDK from AdoptOpenJDK');
+                core.debug("Downloading JDK from AdoptOpenJDK");
                 jdkFile = yield tc.downloadTool(`https://api.adoptopenjdk.net/v2/binary/releases/openjdk${normalize(version)}?openjdk_impl=hotspot&os=${OS}&arch=${arch}&release=latest&type=jdk`);
-                compressedFileExtension = archiveExtension || IS_WINDOWS ? '.zip' : '.tar';
+                compressedFileExtension = archiveExtension || IS_WINDOWS ? ".zip" : ".tar";
             }
             compressedFileExtension = compressedFileExtension || getNormalizedCompressedFileExtension(jdkFile);
-            let tempDir = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000));
+            let tempDir = path.join(tempDirectory, "temp_" + Math.floor(Math.random() * 2000000000));
             jdkDir = yield decompressArchive(jdkFile, compressedFileExtension, tempDir);
             toolPath = yield tc.cacheDir(jdkDir, cacheEntry, "1.0.0", arch);
         }
         targets.split(";").forEach(function (value) {
-            if (value == 'JAVA_HOME')
-                core.addPath(path.join(toolPath, 'bin'));
+            if (value == "JAVA_HOME")
+                core.addPath(path.join(toolPath, "bin"));
             core.exportVariable(value, toolPath);
         });
     });
 }
 exports.installJDK = installJDK;
 function getNormalizedCompressedFileExtension(file) {
-    if (file.endsWith('.tar') || file.endsWith('.tar.gz')) {
-        return '.tar';
+    if (file.endsWith(".tar") || file.endsWith(".tar.gz")) {
+        return ".tar";
     }
-    else if (file.endsWith('.zip')) {
-        return '.zip';
+    else if (file.endsWith(".zip")) {
+        return ".zip";
     }
     else {
-        return '.7z';
+        return ".7z";
     }
 }
 function decompressArchive(repoRoot, fileEnding, destinationFolder) {
@@ -4051,7 +4051,7 @@ function decompressArchive(repoRoot, fileEnding, destinationFolder) {
         if (stats.isFile()) {
             yield extractFiles(jdkFile, fileEnding, destinationFolder);
             const jdkDirectory = path.join(destinationFolder, fs.readdirSync(destinationFolder)[0]);
-            yield unpackJars(jdkDirectory, path.join(jdkDirectory, 'bin'));
+            yield unpackJars(jdkDirectory, path.join(jdkDirectory, "bin"));
             return jdkDirectory;
         }
         else if (stats.isDirectory()) {
@@ -4066,16 +4066,16 @@ function extractFiles(file, fileEnding, destinationFolder) {
     return __awaiter(this, void 0, void 0, function* () {
         const stats = fs.statSync(file);
         if (!stats) {
-            throw new Error(`Failed to extract ${file} - it doesn't exist`);
+            throw new Error(`Failed to extract ${file} - it doesn"t exist`);
         }
         else if (stats.isDirectory()) {
             throw new Error(`Failed to extract ${file} - it is a directory`);
         }
-        if (fileEnding == '.tar') {
+        if (fileEnding == ".tar") {
             core.debug(`Decompressing .tar archive: ${file}`);
             yield tc.extractTar(file, destinationFolder);
         }
-        else if (fileEnding == '.zip') {
+        else if (fileEnding == ".zip") {
             core.debug(`Decompressing .zip archive: ${file}`);
             yield tc.extractZip(file, destinationFolder);
         }
@@ -4095,11 +4095,11 @@ function unpackJars(fsPath, javaBinPath) {
                     yield unpackJars(curPath, javaBinPath);
                 }
             }
-            else if (path.extname(fsPath).toLowerCase() === '.pack') {
+            else if (path.extname(fsPath).toLowerCase() === ".pack") {
                 // Unpack the pack file synchronously
                 const p = path.parse(fsPath);
-                const toolName = IS_WINDOWS ? 'unpack200.exe' : 'unpack200';
-                const args = IS_WINDOWS ? '-r -v -l ""' : '';
+                const toolName = IS_WINDOWS ? "unpack200.exe" : "unpack200";
+                const args = IS_WINDOWS ? '-r -v -l ""' : "";
                 const name = path.join(p.dir, p.name);
                 yield exec.exec(`"${path.join(javaBinPath, toolName)}"`, [
                     `${args} "${name}.pack" "${name}.jar"`
