@@ -98,7 +98,7 @@ from - say - `JDK_X` and `JAVA_HOME`, you would need to specify:
 
 ```
 Copyright (c) 2018 GitHub, Inc. and contributors
-Copyright (c) 2019 Leon Linhart
+Copyright (c) 2019-2020 Leon Linhart
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
