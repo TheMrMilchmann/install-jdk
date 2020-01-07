@@ -62,6 +62,9 @@ By default, this action will try to install the latest JDK release for the
 specified version from AdoptOpenJDK. Alternatively, a `source` can be specified
 explicitly.
 
+The `version` key should be set accordingly for custom downloads since it is
+used to cache JDKs which are used multiple times during the workflow.
+
 #### `architecture`
 
 The target architecture of the JDK to install.

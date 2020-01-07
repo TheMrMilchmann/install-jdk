@@ -25,7 +25,6 @@ import * as installer from "./installer";
 
 async function run() {
     try {
-
         let version = core.getInput("version", { required: true });
         let arch = core.getInput("architecture", { required: false });
         let source = core.getInput("source", { required: false });
