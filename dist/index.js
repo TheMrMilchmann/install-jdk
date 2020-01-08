@@ -3143,7 +3143,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /*
  * Copyright (c) 2018 GitHub, Inc. and contributors
- * Copyright (c) 2019 Leon Linhart
+ * Copyright (c) 2019-2020 Leon Linhart
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -3941,7 +3941,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /*
  * Copyright (c) 2018 GitHub, Inc. and contributors
- * Copyright (c) 2019 Leon Linhart
+ * Copyright (c) 2019-2020 Leon Linhart
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -3986,7 +3986,7 @@ if (!tempDirectory) {
 }
 function installJDK(version, arch, source, archiveExtension, targets) {
     return __awaiter(this, void 0, void 0, function* () {
-        const cacheEntry = `${source ? source : "jdk"}-${version}`; // Trick the caching system for more flexibility
+        const cacheEntry = `jdk-${version}`; // Trick the caching system for more flexibility
         let toolPath = tc.find(cacheEntry, "1.0.0", arch);
         if (toolPath) {
             core.debug(`JDK found in cache: ${toolPath}`);
