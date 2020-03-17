@@ -4,7 +4,8 @@
 
 ### Version History
 
-* 2020-01-08 [1.0.0](1.0.0.md) (latest)
+* 2010-03-17 [1.0.1](1.0.1.md) (latest)
+* 2020-01-08 [1.0.0](1.0.0.md)
 
 
 This action is strictly following [SemVer 2.0.0](https://semver.org/spec/v2.0.0.html).
